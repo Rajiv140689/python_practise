@@ -1,0 +1,84 @@
+#Basic Window Function: ROW_NUMBER()
+SELECT
+    user_id,
+    transaction_date,
+    ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY transaction_date) AS row_num
+FROM
+    transactions
+
+
+#Using NULLS FIRST and NULLS LAST
+SELECT
+    product_id,
+    price,
+    ROW_NUMBER() OVER (ORDER BY price DESC NULLS LAST) AS row_num
+FROM
+    products
+
+
+#RANK() vs. DENSE_RANK() vs. ROW_NUMBER()
+SELECT
+    employee_id,
+    salary,
+    RANK() OVER (ORDER BY salary DESC) AS rank,
+    DENSE_RANK() OVER (ORDER BY salary DESC) AS dense_rank,
+    ROW_NUMBER() OVER (ORDER BY salary DESC) AS row_num
+FROM
+    employees
+
+
+#LEAD() and LAG()
+SELECT
+    user_id,
+    transaction_date,
+    amount,
+    LAG(amount, 1) OVER (PARTITION BY user_id ORDER BY transaction_date) AS previous_transaction,
+    LEAD(amount, 1) OVER (PARTITION BY user_id ORDER BY transaction_date) AS next_transaction
+FROM
+    transactions
+
+
+
+#SUM() with a Window Frame
+SELECT
+    user_id,
+    transaction_date,
+    amount,
+    SUM(amount) OVER (PARTITION BY user_id ORDER BY transaction_date
+        ROWS BETWEEN 1 PRECEDING AND CURRENT ROW) AS running_total
+FROM
+    transactions
+
+
+
+#FIRST_VALUE() and LAST_VALUE() with Window Frame
+SELECT
+    user_id,
+    transaction_date,
+    amount,
+    FIRST_VALUE(amount) OVER (PARTITION BY user_id ORDER BY transaction_date
+        ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS first_transaction,
+    LAST_VALUE(amount) OVER (PARTITION BY user_id ORDER BY transaction_date
+        ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS last_transaction
+FROM
+    transactions
+
+#DISTRIBUTE BY
+SELECT
+    user_id,
+    transaction_date,
+    ROW_NUMBER() OVER (DISTRIBUTE BY user_id ORDER BY transaction_date) AS row_num
+FROM
+    transactions
+
+
+#Range-based Window Frame
+SELECT
+    user_id,
+    transaction_date,
+    amount,
+    SUM(amount) OVER (PARTITION BY user_id ORDER BY transaction_date
+        RANGE BETWEEN INTERVAL 7 DAYS PRECEDING AND CURRENT ROW) AS total_last_week
+FROM
+    transactions
+
